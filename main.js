@@ -1,7 +1,9 @@
 const debug = true;
 
 /** @type HTMLButtonElement */
-const button = document.getElementById("draw");
+const startButton = document.getElementById("start");
+/** @type HTMLButtonElement */
+const stopButton = document.getElementById("stop");
 /** @type HTMLImageElement */
 const image = document.getElementById("image");
 /** @type HTMLHeadingElement */
@@ -9,9 +11,13 @@ const title = document.getElementById("title");
 /** @type HTMLParagraphElement */
 const description = document.getElementById("description");
 
+let rouletteIntervalHandle;
 let index = 0;
 
 window.addEventListener("DOMContentLoaded", () => {
+  stopButton.style.display = "none";
+
+  // 以前の状態を復元
   const lastIndex = localStorage.getItem("index");
   const weekday = localStorage.getItem("weekday");
 
@@ -21,7 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
       index = parseInt(lastIndex);
 
       if (!debug) {
-        button.style.display = "none";
+        startButton.style.display = "none";
       }
       showTodayCard();
     }
@@ -29,20 +35,22 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function roulette() {
-  button.style.display = "none";
+  startButton.style.display = "none";
+  stopButton.style.display = "";
 
-  const handle = setInterval(() => draw(), 50);
-  // 3秒後にルーレットを止める
-  setTimeout(() => {
-    clearInterval(handle);
+  rouletteIntervalHandle = setInterval(() => draw(), 50);
+}
 
-    showTodayCard();
-    saveLocalStorage();
+function stop() {
+  stopButton.style.display = "none";
+  clearInterval(rouletteIntervalHandle);
 
-    if (debug) {
-      button.style.display = "";
-    }
-  }, 3000);
+  showTodayCard();
+  saveLocalStorage();
+
+  if (debug) {
+    startButton.style.display = "";
+  }
 }
 
 function draw() {
